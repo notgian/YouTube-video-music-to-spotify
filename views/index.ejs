@@ -1,0 +1,157 @@
+<html lang="en" data-bs-theme="dark">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SpotYT</title>
+  <link rel="stylesheet" type="text/css"
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css" />
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"
+    integrity="sha384-HwwvtgBNo3bZJJLYd8oVXjrBZt8cqVSpeBNS5n7C8IVInixGAoxmnlMuBnhbgrkm"
+    crossorigin="anonymous"></script>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="testData.js"></script>
+  <style>
+    .music-tooltip {
+      --bs-tooltip-bg: #161718;
+      --bs-tooltip-color: var(--bs-white);
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container pt-5">
+    <h1>SpotYT</h1>
+    <p>A simple tool for retrieving music from YouTube videos and adding them to Spotify.</p>
+
+    <script defer> 
+      function getAuthenticationStatus() {
+        if (localStorage.getItem('access_token') != null) return true
+        else false
+      }
+    const authenticated = getAuthenticationStatus()
+    </script>
+
+    <div class="container-fluid d-none" id="authenticated-container">
+      
+      <div class="modal modal-lg fade" tabindex="-1" id="loading-modal" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body d-flex flex-column justify-content-center align-items-center">
+              <div class="modal-header">
+                <div class="fs-3 fw-bold" id="loading-modal-text">Retrieving Songs</div>
+              </div>
+              <div class="spinner-grow fs-2 my-3 text-success" style="width: 1.5em; height:1.5em" role="status">
+                <span class="visually-hidden">Loading...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal modal-lg fade" tabindex="-1" id="error-modal" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body d-flex flex-column justify-content-center align-items-center">
+              <div class="modal-header">
+                <div class="fs-3 fw-bold error-modal-text">Error Has Occured</div>
+              </div>
+              <div class="error-modal-text px-2 pt-4" id="error-modal-body">Insert Error Message Here</div>
+              <button type="button" class="btn btn-danger px-4 m-3" onclick="window.location.reload()">Refresh Page</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal modal-lg fade" tabindex="-1" id="songs-confirmation-modal" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body d-flex flex-column justify-content-center align-items-center px-5 pb-5">
+              <div class="modal-header">
+                <div class="fs-3 fw-bold">Select Songs</div>
+              </div>
+              <div class="items mt-3">
+                <p class="text-body-secondary">
+                  Select the songs you wish to add to the playlist then click proceed. <br />
+                  Hover to play a preview of the song and to view track info.
+                </p>
+                <form class="d-block text-align-left px-3" id="modal-checkbox-container">
+                </form> 
+                <button type="button" class="btn btn-success px-4" id="select-song-proceed">Proceed</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal modal-lg fade" tabindex="-1" id="completion-modal" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-body d-flex flex-column justify-content-center align-items-center">
+              <div class="modal-header">
+                <div class="fs-3 fw-bold" id="completion-modal-text">Operation Complete</div>
+              </div>
+              <div class="completion-modal-content-container px-3 py-2 d-flex flex-column justify-content-center align-items-center">
+                <div class="completion-modal-message" id="completion-modal-message"></div>
+                <div class="completion-modal-text text-center mb-3">
+                  Check your playlist list on your account or find the playlist <a href="" target="_blank" link-offset-1 link-underline link-underline-opacity-0 link-underline-opacity-75-hover" id="completion-modal-link">here</a>.
+                </div>
+                <div class="completion-modal-text text-body-secondary mb-2" id="completion-modal-playlistID">
+                  Insert-playlist-ID
+                </div>
+                <button type="button" class="btn btn-success px-4" onclick="window.location.reload()">Refresh Page</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <form class="p-4" action="" method="POST" id="mainForm">
+        <div class="mb-4">
+          <label for="youtube-url" class="form-label">YouTube URL</label>
+          <div class="form-text">Required field.</div>
+          <input type="url" class="form-control" name="youtube-url" placeholder="https://www.youtube.com/watch?valid_youtube_url" pattern="(https://www.youtube.com/watch?.+|https://youtu.be/.+)" required>
+        </div>
+        <div class="mb-4">
+          <label for="playlist-name" class="form-label">Playlist Name</label>
+          <div class="form-text">Optional field. Specifies name of the playlist to be created. If left empty, the
+            playlist created will have the same name as the YouTube video.</div>
+          <input type="text" class="form-control" name="playlist-name" placeholder="Custom playlist name">
+        </div>
+        <div class="mb-4">
+          <label for="playlist-url" class="form-label">Spotify Playlist URL</label>
+          <div class="form-text">Optional field. Specifies a playlist URL to where the found songs will be added. If a
+            value is provided here, any value provided in the Playlist Name above will be completely disregarded. If
+            left empty a new playlist will be created.</div>
+          <input type="text" class="form-control" name="playlist-url"
+            placeholder="https://open.spotify.com/playlist/valid_spotify_playlist_url">
+        </div>
+        <button type="submit" class="btn btn-success px-4">Submit</button>
+      </form>
+    </div>
+
+    <div class="container-fluid d-none" id="not-authenticated-container">
+      <div class="mt-5">
+        <h2>Missing Permissions</h2>
+        <p>To properly work, this app needs a few permissions from Spotify. Click the button below to grant the app
+          access to these permissions.</p>
+        <button type='button' class='btn btn-success' onclick="window.location='/login'">Authenticate</button>
+      </div>
+    </div>
+
+    <script>
+      const authContainer = document.getElementById('authenticated-container')
+      const notAuthContainer = document.getElementById('not-authenticated-container')
+
+      if (authenticated) authContainer.classList.remove('d-none')
+      else notAuthContainer.classList.remove('d-none')
+
+    </script>
+
+  </div>
+
+  <script defer src="homepage.js"></script>
+
+</body>
+
+</html>

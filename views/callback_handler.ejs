@@ -1,0 +1,9 @@
+<script>
+    document.addEventListener('DOMContentLoaded', (e) => {
+        localStorage.setItem('access_token', '<%= tokenData.access_token %>');
+        localStorage.setItem('refresh_token', '<%= tokenData.refresh_token %>');
+        localStorage.setItem('expires_on', '<%= tokenData.expires_on %>');
+        window.location ='/';
+    // console.log('help')
+    })
+</script>
