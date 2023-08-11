@@ -6,7 +6,7 @@ A simple project obtains the music that YouTube detects on a video and ports the
 
 This project is unfortunately only hosted locally because (1) I cannot host it on my own hardware, and (2) I do not wish to pay an external service to keep it running. However, if you are interested in using it, do the following:
 
-1. Go to https://developer.spotify.com/[https://developer.spotify.com], login, and enter your dashboard.
+1. Go to https://developer.spotify.com/, login, and enter your dashboard.
 2. Create an app and obtain the client secret and client id of the app.
 ![Screenshot from 2023-08-11 15-51-01](https://github.com/notgian/YouTube-video-music-to-spotify/assets/85060753/39bebfa4-5ca8-4f34-9b38-7a75f76aae19)
 3. In the app settings, add a redirect URI and set it to `http://localhost:3000/callback`. You have the option to change the port number, but if you wish to do so, you need to go through the source code to make sure that any instance of this host is also edited accordingly. 
