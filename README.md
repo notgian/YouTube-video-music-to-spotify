@@ -16,3 +16,7 @@ This project is unfortunately only hosted locally because (1) I cannot host it o
 > CLIENT_SECRET="your app's client secret"
 
 All that's left is to navigate to the directory in terminal and run `npm i` to install dependencies and start the app with `node server.mjs`
+
+## Features for Implementation/ Feature Ideas
+*I have no guarantees that I'll even make these but damn do I wanna save these for future reference*
+- Duplicate detection
