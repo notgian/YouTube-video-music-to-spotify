@@ -12,5 +12,5 @@ This project is unfortunately only hosted locally because (1) I cannot host it o
 3. In the app settings, add a redirect URI and set it to `http://localhost:3000/callback`. You have the option to change the port number, but if you wish to do so, you need to go through the source code to make sure that any instance of this host is also edited accordingly. 
 4. Add a `.env` file in the main directory and add two fields: `CLIENT_ID` and `CLIENT_SECRET` (all caps).
 5. Set the fields to be equal to your app's client id and client secret
-> CLIENT_ID="your app's client id"
-> CLIENT_SECRET="your app's client secret"
+`CLIENT_ID="your app's client id"
+CLIENT_SECRET="your app's client secret"`
